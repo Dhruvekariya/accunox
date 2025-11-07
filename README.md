@@ -6,6 +6,14 @@ This repository contains the containerized Wisecow application with Kubernetes d
 
 Wisecow is a simple web server that serves random fortune quotes with ASCII cow art on port 4499.
 
+**Features:**
+- Random fortune quotes
+- ASCII art cow display
+- Dockerized application
+- Kubernetes deployment ready
+- TLS/HTTPS support via Ingress
+- Automated CI/CD pipeline
+
 ## Prerequisites
 
 - Docker
@@ -70,10 +78,27 @@ curl http://localhost:8080
 
 ## CI/CD Pipeline
 
+### Continuous Integration (Automated)
+
 The GitHub Actions workflow automatically:
 1. Builds the Docker image on every push to `main` branch
-2. Pushes the image to Docker Hub with appropriate tags
-3. Uses caching to speed up builds
+2. Pushes the image to Docker Hub with tags (`latest` and SHA-based)
+3. Uses layer caching to speed up builds
+
+**Workflow file:** `.github/workflows/docker-build-push.yaml`
+
+### Continuous Deployment
+
+For deployment automation:
+```bash
+# Deploy latest image
+./scripts/deploy.sh
+
+# Deploy specific image tag
+IMAGE_NAME=dhruvekariyaa/wisecow:main-abc1234 ./scripts/deploy.sh
+```
+
+**📖 For detailed CD setup options, see:** [docs/CD_SETUP.md](docs/CD_SETUP.md)
 
 ### Setup GitHub Secrets
 
@@ -85,6 +110,20 @@ Add the following secret to your GitHub repository:
 1. Go to repository Settings → Secrets and variables → Actions
 2. Click "New repository secret"
 3. Add `DOCKER_TOKEN` with your Docker Hub access token
+
+### Verify CI/CD Pipeline
+
+```bash
+# Make a change
+git commit -am "Test CI/CD"
+git push
+
+# Watch GitHub Actions
+# Visit: https://github.com/YOUR_USERNAME/accunox/actions
+
+# Once CI completes, deploy
+./scripts/deploy.sh
+```
 
 ## Application Features
 
