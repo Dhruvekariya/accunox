@@ -101,6 +101,52 @@ Add the following secret to your GitHub repository:
 
 Image available at: `dhruvekariyaa/wisecow:latest`
 
+## TLS Configuration
+
+The application is configured with HTTPS using self-signed certificates and NGINX Ingress Controller.
+
+### Prerequisites for TLS
+- NGINX Ingress Controller installed in cluster
+- Self-signed TLS certificate (or use cert-manager for production)
+
+### Deploy with TLS
+
+```bash
+# Install NGINX Ingress Controller (if not already installed)
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
+
+# Create TLS certificate (self-signed for testing)
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout wisecow-tls.key \
+  -out wisecow-tls.crt \
+  -subj "/CN=wisecow.local/O=wisecow"
+
+# Create Kubernetes TLS secret
+kubectl create secret tls wisecow-tls --cert=wisecow-tls.crt --key=wisecow-tls.key
+
+# Apply all manifests
+kubectl apply -f k8s/
+
+# Verify Ingress
+kubectl get ingress
+```
+
+### Access via HTTPS
+
+```bash
+# Port forward the Ingress controller
+kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 8443:443
+
+# Test HTTPS connection
+curl -k -H "Host: wisecow.local" https://localhost:8443
+```
+
+**TLS Details:**
+- Domain: wisecow.local
+- Certificate: Self-signed X.509
+- Validity: 365 days
+- Ingress: NGINX with TLS termination
+
 ## License
 
 This project follows the original Wisecow repository license.
