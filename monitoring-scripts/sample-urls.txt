@@ -1,0 +1,15 @@
+# Sample URLs for Application Health Checker
+# One URL per line, # for comments
+
+# Public websites
+https://google.com
+https://github.com
+https://example.com
+
+# API endpoints (examples)
+# https://api.github.com
+# https://httpbin.org/status/200
+
+# Local applications (uncomment if running)
+# http://localhost:8080
+# http://localhost:3000
