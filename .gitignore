@@ -14,3 +14,7 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Local development files
+commands.txt
+TASK_TRACKER.md

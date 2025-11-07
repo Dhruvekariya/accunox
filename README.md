@@ -1,18 +1,41 @@
-# Wisecow Application - Kubernetes Deployment
+# Accuknox DevOps Trainee Assessment
 
-This repository contains the containerized Wisecow application with Kubernetes deployment manifests and CI/CD pipeline.
+**Candidate:** Dhruv Vekariya
+**Repository:** https://github.com/Dhruvekariya/accunox
+**Docker Image:** https://hub.docker.com/r/dhruvekariyaa/wisecow
+
+This repository contains the complete implementation of the Accuknox DevOps Trainee Practical Assessment including:
+- Problem Statement 1: Wisecow Application Containerization & Kubernetes Deployment
+- Problem Statement 2: System Monitoring Scripts (Application Health Checker + System Health Monitor)
+- Problem Statement 3: KubeArmor Zero-Trust Policy (Optional - TBD)
+
+---
 
 ## Overview
 
-Wisecow is a simple web server that serves random fortune quotes with ASCII cow art on port 4499.
+**Wisecow Application:** A simple web server that serves random fortune quotes with ASCII cow art on port 4499.
 
-**Features:**
-- Random fortune quotes
-- ASCII art cow display
-- Dockerized application
-- Kubernetes deployment ready
-- TLS/HTTPS support via Ingress
-- Automated CI/CD pipeline
+### Features Implemented
+- ✅ Dockerized application (Ubuntu 22.04 base)
+- ✅ Kubernetes deployment with 2 replicas
+- ✅ Automated CI/CD pipeline (GitHub Actions)
+- ✅ TLS/HTTPS support via NGINX Ingress (Challenge Goal)
+- ✅ Continuous Deployment automation (Challenge Goal)
+- ✅ Application Health Monitoring script
+- ✅ System Health Monitoring script
+
+---
+
+## 📋 Assessment Requirement Clarification
+
+**Repository Visibility:**
+The assessment PDF contains a contradiction:
+- Page 1 states: "A **private** GitHub repository"
+- Page 2 states: "The GitHub repository should be set to **public**"
+
+**✅ Implementation Decision:** This repository is **PUBLIC** following the explicit "Access Control" section on page 2, which is the authoritative final requirement and necessary for assessment review.
+
+---
 
 ## Prerequisites
 
@@ -25,14 +48,30 @@ Wisecow is a simple web server that serves random fortune quotes with ASCII cow 
 
 ```
 .
-├── Dockerfile                 # Container image definition
-├── wisecow.sh                # Main application script
-├── k8s/
-│   ├── deployment.yaml       # Kubernetes Deployment manifest
-│   └── service.yaml          # Kubernetes Service manifest (LoadBalancer)
-└── .github/
-    └── workflows/
-        └── docker-build-push.yaml  # CI/CD workflow
+├── Dockerfile                      # Container image definition
+├── wisecow.sh                      # Main application script
+├── LICENSE                         # Apache License 2.0
+├── README.md                       # This file
+│
+├── k8s/                           # Kubernetes manifests
+│   ├── deployment.yaml            # Deployment with 2 replicas, health probes
+│   ├── service.yaml               # ClusterIP service
+│   └── ingress.yaml               # Ingress with TLS configuration
+│
+├── .github/workflows/             # CI/CD automation
+│   └── docker-build-push.yaml     # GitHub Actions workflow
+│
+├── scripts/                       # Deployment automation
+│   └── deploy.sh                  # Kubernetes deployment script
+│
+├── docs/                          # Documentation
+│   └── CD_SETUP.md                # Continuous Deployment guide
+│
+└── monitoring-scripts/            # Problem Statement 2
+    ├── app_health_checker.py      # HTTP health monitoring
+    ├── system_health_monitor.py   # System resource monitoring
+    ├── sample-urls.txt            # Sample URLs for testing
+    └── README.md                  # Monitoring scripts documentation
 ```
 
 ## Local Development
@@ -186,6 +225,89 @@ curl -k -H "Host: wisecow.local" https://localhost:8443
 - Validity: 365 days
 - Ingress: NGINX with TLS termination
 
+---
+
+## Problem Statement 2: Monitoring Scripts
+
+This repository includes two production-ready monitoring scripts located in `monitoring-scripts/`:
+
+### 1. Application Health Checker (`app_health_checker.py`)
+
+Monitors application uptime by checking HTTP status codes.
+
+**Features:**
+- Single or multiple URL monitoring
+- HTTP status code analysis (200-599)
+- UP/DOWN status determination
+- Continuous monitoring mode
+- File-based URL input
+- Configurable timeout
+- Color-coded console output
+
+**Usage:**
+```bash
+# Check single application
+python3 monitoring-scripts/app_health_checker.py https://example.com
+
+# Check multiple applications
+python3 monitoring-scripts/app_health_checker.py https://google.com https://github.com
+
+# Continuous monitoring (every 60 seconds)
+python3 monitoring-scripts/app_health_checker.py --continuous --interval 60 https://example.com
+
+# From file
+python3 monitoring-scripts/app_health_checker.py --file monitoring-scripts/sample-urls.txt
+```
+
+### 2. System Health Monitor (`system_health_monitor.py`)
+
+Monitors system resources with threshold-based alerting.
+
+**Features:**
+- CPU usage monitoring
+- Memory usage monitoring
+- Disk space monitoring
+- Top 5 CPU-consuming processes
+- Configurable thresholds (default: 80%)
+- Alert system for exceeded thresholds
+- Continuous monitoring mode
+- File logging support
+- Cross-platform (macOS/Linux)
+
+**Usage:**
+```bash
+# One-time system check
+python3 monitoring-scripts/system_health_monitor.py
+
+# Continuous monitoring with logging
+python3 monitoring-scripts/system_health_monitor.py --continuous --interval 60 --log health.log
+
+# Custom thresholds
+python3 monitoring-scripts/system_health_monitor.py --thresholds cpu=90,memory=85,disk=80
+```
+
+**📖 Complete documentation:** [monitoring-scripts/README.md](monitoring-scripts/README.md)
+
+---
+
+## Assessment Status
+
+### ✅ Problem Statement 1: Complete (100%)
+- [x] Dockerization
+- [x] Kubernetes Deployment
+- [x] CI/CD Pipeline (GitHub Actions)
+- [x] TLS Implementation (Challenge Goal)
+- [x] Continuous Deployment (Challenge Goal)
+
+### ✅ Problem Statement 2: Complete (100%)
+- [x] Application Health Checker Script
+- [x] System Health Monitor Script
+
+### ⏳ Problem Statement 3: Optional (Extra Credit)
+- [ ] KubeArmor Zero-Trust Policy
+
+---
+
 ## License
 
-This project follows the original Wisecow repository license.
+This project follows the original Wisecow repository license (Apache License 2.0).
