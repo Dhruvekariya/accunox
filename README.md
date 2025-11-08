@@ -7,7 +7,7 @@
 This repository contains the complete implementation of the Accuknox DevOps Trainee Practical Assessment including:
 - Problem Statement 1: Wisecow Application Containerization & Kubernetes Deployment
 - Problem Statement 2: System Monitoring Scripts (Application Health Checker + System Health Monitor)
-- Problem Statement 3: KubeArmor Zero-Trust Policy (Optional - TBD)
+- Problem Statement 3: KubeArmor Zero-Trust Policy (Optional - Complete)
 
 ---
 
@@ -23,6 +23,7 @@ This repository contains the complete implementation of the Accuknox DevOps Trai
 - ✅ Continuous Deployment automation (Challenge Goal)
 - ✅ Application Health Monitoring script
 - ✅ System Health Monitoring script
+- ✅ KubeArmor Zero-Trust Security Policy (Optional)
 
 ---
 
@@ -48,7 +49,7 @@ The assessment PDF contains a contradiction:
 
 ```
 .
-├── Dockerfile                      # Container image definition
+├── Dockerfile                      # Multi-arch container (linux/amd64, linux/arm64)
 ├── wisecow.sh                      # Main application script
 ├── LICENSE                         # Apache License 2.0
 ├── README.md                       # This file
@@ -67,11 +68,15 @@ The assessment PDF contains a contradiction:
 ├── docs/                          # Documentation
 │   └── CD_SETUP.md                # Continuous Deployment guide
 │
-└── monitoring-scripts/            # Problem Statement 2
-    ├── app_health_checker.py      # HTTP health monitoring
-    ├── system_health_monitor.py   # System resource monitoring
-    ├── sample-urls.txt            # Sample URLs for testing
-    └── README.md                  # Monitoring scripts documentation
+├── monitoring-scripts/            # Problem Statement 2
+│   ├── app_health_checker.py      # HTTP health monitoring
+│   ├── system_health_monitor.py   # System resource monitoring
+│   ├── sample-urls.txt            # Sample URLs for testing
+│   └── README.md                  # Monitoring scripts documentation
+│
+└── kubearmor-policies/            # Problem Statement 3 (Complete)
+    ├── wisecow-zero-trust-policy.yaml  # KubeArmor security policy
+    └── README.md                       # Policy documentation
 ```
 
 ## Local Development
@@ -293,18 +298,40 @@ python3 monitoring-scripts/system_health_monitor.py --thresholds cpu=90,memory=8
 ## Assessment Status
 
 ### ✅ Problem Statement 1: Complete (100%)
-- [x] Dockerization
+- [x] Dockerization (Multi-arch: amd64/arm64)
 - [x] Kubernetes Deployment
 - [x] CI/CD Pipeline (GitHub Actions)
 - [x] TLS Implementation (Challenge Goal)
 - [x] Continuous Deployment (Challenge Goal)
 
+**Latest Updates:**
+- Built and pushed multi-architecture Docker image (supports both Intel and ARM)
+- Image available: `dhruvekariyaa/wisecow:latest`
+- Verified deployment on OrbStack Kubernetes
+
 ### ✅ Problem Statement 2: Complete (100%)
 - [x] Application Health Checker Script
 - [x] System Health Monitor Script
 
-### ⏳ Problem Statement 3: Optional (Extra Credit)
-- [ ] KubeArmor Zero-Trust Policy
+**Both scripts tested and working:**
+- HTTP health monitoring with status code analysis
+- System resource monitoring with threshold alerts
+
+### ✅ Problem Statement 3: Complete (100%) - Optional Extra Credit
+- [x] KubeArmor installation (Helm deployed)
+- [x] KubeArmor operator and controller running
+- [x] Zero-trust policy written with proper syntax
+- [x] Policy applied and enforced successfully
+- [x] Policy validation and testing completed
+- [x] Comprehensive documentation created
+
+**Latest Updates:**
+- KubeArmor v1.6.3 installed via Helm in `kubearmor` namespace
+- Zero-trust policy enforcing file, process, network, and capability restrictions
+- Policy successfully blocks unauthorized access while allowing application to function
+- Complete security documentation with verification steps
+
+**📖 Complete documentation:** [kubearmor-policies/README.md](kubearmor-policies/README.md)
 
 ---
 

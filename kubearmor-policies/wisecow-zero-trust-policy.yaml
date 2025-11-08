@@ -1,0 +1,102 @@
+apiVersion: security.kubearmor.com/v1
+kind: KubeArmorPolicy
+metadata:
+  name: wisecow-zero-trust-policy
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: wisecow
+
+  # File access restrictions - Zero Trust approach
+  file:
+    matchDirectories:
+    # Block access to sensitive system directories
+    - dir: /etc/
+      recursive: true
+      action: Block
+    - dir: /root/
+      recursive: true
+      action: Block
+    - dir: /var/log/
+      recursive: true
+      action: Block
+    - dir: /boot/
+      recursive: true
+      action: Block
+    - dir: /sys/
+      recursive: true
+      action: Block
+    # Allow read-only access to required system files
+    - dir: /usr/
+      recursive: true
+      readOnly: true
+      action: Allow
+    - dir: /lib/
+      recursive: true
+      readOnly: true
+      action: Allow
+    # Allow access to application directory
+    - dir: /app/
+      recursive: true
+      action: Allow
+
+    matchPaths:
+    # Block access to sensitive files
+    - path: /etc/passwd
+      action: Block
+    - path: /etc/shadow
+      action: Block
+    - path: /etc/hosts
+      action: Block
+
+  # Process execution restrictions
+  process:
+    matchPaths:
+    # Allow only necessary processes for the application
+    - path: /app/wisecow.sh
+      action: Allow
+    - path: /usr/games/fortune
+      action: Allow
+    - path: /usr/games/cowsay
+      action: Allow
+    - path: /bin/nc
+      action: Allow
+    - path: /bin/bash
+      action: Allow
+    - path: /bin/sh
+      action: Allow
+
+    matchDirectories:
+    # Block execution from tmp directories (prevent script injection)
+    - dir: /tmp/
+      recursive: true
+      action: Block
+    - dir: /var/tmp/
+      recursive: true
+      action: Block
+
+  # Network restrictions
+  network:
+    matchProtocols:
+    - protocol: tcp
+      action: Allow
+    - protocol: udp
+      action: Block
+
+  # Capabilities restrictions (lowercase as per KubeArmor requirement)
+  capabilities:
+    matchCapabilities:
+    - capability: net_admin
+      action: Block
+    - capability: sys_admin
+      action: Block
+    - capability: sys_ptrace
+      action: Block
+    - capability: sys_module
+      action: Block
+    - capability: dac_override
+      action: Block
+
+  # Action on policy violation
+  action: Block
