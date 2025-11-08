@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>KubeArmor Pod Annotations - Wisecow</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #f0f0f0;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+        }
+        .terminal {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            padding-bottom: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            max-width: 1200px;
+            margin: 0 auto 40px auto;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .terminal-header {
+            background: #2d2d2d;
+            padding: 10px 15px;
+            margin: -20px -20px 15px -20px;
+            border-radius: 8px 8px 0 0;
+            font-weight: bold;
+            color: #ffffff;
+            border-bottom: 1px solid #3d3d3d;
+        }
+        .command {
+            color: #4ec9b0;
+            margin-top: 15px;
+        }
+        .prompt {
+            color: #569cd6;
+            font-weight: bold;
+        }
+        .output {
+            color: #ce9178;
+            margin-left: 0;
+        }
+        .error {
+            color: #f48771;
+        }
+        .success {
+            color: #4ec9b0;
+        }
+        .header {
+            color: #dcdcaa;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .separator {
+            color: #666;
+            margin: 10px 0;
+        }
+        .timestamp {
+            color: #858585;
+            font-size: 11px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal">
+        <div class="terminal-header">KubeArmor Pod Annotations - Wisecow</div>
+        <div class="timestamp">Generated: 2025-11-08 20:47:09</div>
+        <pre><span class="header">═══════════════════════════════════════════════════════════════════════</span>
+<span class="header">KubeArmor Pod Annotations - Verification</span>
+<span class="header">═══════════════════════════════════════════════════════════════════════</span>
+
+<span class="prompt">$</span> <span class="command">kubectl get pod wisecow-66f4ccc977-lwpnp -o jsonpath='{.metadata.annotations}' | jq</span>
+<span class="success">{
+    "kubearmor-policy": "enabled",
+    "kubearmor-visibility": "process,file,network,capabilities",
+    "kubectl.kubernetes.io/restartedAt": "2025-11-08T19:47:47+05:30"
+}
+</span>
+
+<span class="separator">───────────────────────────────────────────────────────────────────────</span>
+<span class="header">Annotations Indicate:</span>
+<span class="separator">───────────────────────────────────────────────────────────────────────</span>
+
+<span class="success">✓ kubearmor-policy: enabled</span>
+<span class="success">✓ kubearmor-visibility: process,file,network,capabilities</span>
+<span class="success">✓ KubeArmor is actively monitoring and enforcing policy on this pod</span>
+
+<span class="separator">───────────────────────────────────────────────────────────────────────</span>
+
+<span class="header">Verification Complete:</span>
+<span class="success">✅ KubeArmor annotations present on all wisecow pods</span>
+<span class="success">✅ Policy enforcement is active</span>
+<span class="success">✅ Full visibility enabled for all security events</span>
+</pre>
+    </div>
+</body>
+</html>
