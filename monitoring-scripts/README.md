@@ -340,20 +340,6 @@ python3 system_health_monitor.py --log test.log && cat test.log
 
 ---
 
-## Future Enhancements
-
-### Potential Features
-1. Email/Slack notifications
-2. Prometheus metrics export
-3. JSON output format
-4. Database storage for historical data
-5. Web dashboard
-6. Multiple alert channels
-7. Machine learning for anomaly detection
-8. Docker container support
-
----
-
 ## License
 
 These scripts are created for the Accuknox DevOps Trainee Assessment.

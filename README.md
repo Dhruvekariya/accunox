@@ -250,5 +250,3 @@ This project was developed as part of a technical assessment. Feel free to fork,
 Apache License 2.0 - following the original [Wisecow](https://github.com/nyrahul/wisecow) project license.
 
 ---
-
-**Note**: This repository is set to public as specified in the assessment requirements (Access Control section, Page 2).

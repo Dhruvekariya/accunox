@@ -193,14 +193,20 @@ nc -u host port      # Blocked - UDP not allowed
 
 The following screenshots demonstrate the policy in action:
 
-### Policy Enforcement and Violations
-![Screenshot showing KubeArmor blocking unauthorized file access attempts to /etc/passwd and other sensitive system directories](screenshots/policy-violation-1.png)
+### Pod Annotations Verification
+![Screenshot showing kubectl output of Wisecow pod annotations with KubeArmor policy enabled and visibility settings](screenshots/kubearmor-pod-annotations.png)
 
-### Process Execution Restrictions
-![Screenshot demonstrating blocked process execution from temporary directories and unauthorized binaries](screenshots/policy-violation-2.png)
+*Displays pod annotations confirming KubeArmor is actively monitoring the Wisecow application with policy enforcement enabled.*
 
-### Policy Configuration and Status
-![Screenshot displaying KubeArmor policy configuration, active rules, and enforcement status via kubectl describe](screenshots/policy-violation-3.png)
+### Policy Violations Demonstration
+![Screenshot showing three blocked attempts to access sensitive files including /etc/passwd, /etc/ directory, and /etc/shadow with OCI runtime errors](screenshots/policy-violations-demo.png)
+
+*Demonstrates the zero-trust policy successfully blocking unauthorized file access attempts to system directories and sensitive configuration files.*
+
+### Policy Configuration Details
+![Screenshot displaying kubectl describe output of the wisecow-zero-trust-policy showing all capabilities blocks, file restrictions, process whitelists, and network protocol rules](screenshots/policy-configuration.png)
+
+*Shows the complete policy configuration including blocked Linux capabilities, restricted directories, allowed processes, and network protocol settings.*
 
 ## Security Benefits
 
@@ -270,7 +276,3 @@ This implementation fulfills the optional Problem Statement 3 requirements:
 - Policy enforcement verified and tested
 - Screenshots documenting policy violations
 - Comprehensive documentation provided
-
----
-
-**Last Updated**: 2025-11-10

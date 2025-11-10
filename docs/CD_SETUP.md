@@ -187,28 +187,6 @@ curl http://localhost:8080
 - Use cert-manager for automated certificate management
 - Configure Ingress with authentication for production deployments
 
-## Future Enhancements
-
-1. **Implement rollback automation**
-   ```bash
-   kubectl rollout undo deployment/wisecow
-   ```
-
-2. **Add health checks in workflow**
-   ```bash
-   curl -f https://wisecow.local/health || exit 1
-   ```
-
-3. **Implement blue-green deployment**
-   - Deploy to blue environment
-   - Run smoke tests
-   - Switch traffic to blue
-   - Keep green for rollback
-
-4. **Add Slack/Discord notifications**
-   - Notify on deployment success/failure
-   - Include image SHA and deployment time
-
 ## Monitoring Deployments
 
 ```bash
