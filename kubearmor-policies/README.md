@@ -1,147 +1,125 @@
-# KubeArmor Zero-Trust Security Policy for Wisecow
+# KubeArmor Zero-Trust Security Policy
+
+Runtime security implementation for the Wisecow application using KubeArmor's zero-trust enforcement model.
 
 ## Overview
 
-This directory contains the KubeArmor security policy implementing zero-trust principles for the Wisecow application.
+This directory contains a Kubernetes security policy that implements the principle of least privilege for the Wisecow application. The policy restricts file access, process execution, network protocols, and system capabilities to only what's required for the application to function.
 
-**Policy File:** `wisecow-zero-trust-policy.yaml`
+**Policy File**: `wisecow-zero-trust-policy.yaml`
+**Enforcement Mode**: Block (deny-by-default)
+**Target**: Pods with label `app=wisecow`
 
-**Status:** ✅ Applied and Enforced
+## What Does This Policy Do?
 
-## Policy Enforcement Summary
+The `wisecow-zero-trust-policy` takes a deny-by-default approach, explicitly allowing only necessary operations while blocking everything else.
 
-The `wisecow-zero-trust-policy` implements a **deny-by-default** security model that restricts container behavior to only what is necessary for the Wisecow application to function.
+### File Access Controls
 
-### Applied Restrictions
-
-#### 1. File Access Restrictions
-
-**Blocked Directories (Prevent Unauthorized Access):**
+**Blocked Directories**:
 - `/etc/` - System configuration files
 - `/root/` - Root user home directory
 - `/var/log/` - System logs
 - `/boot/` - Boot loader files
-- `/sys/` - System kernel interface
+- `/sys/` - Kernel interface
 
-**Blocked Files (Sensitive Data Protection):**
+**Blocked Files**:
 - `/etc/passwd` - User account information
 - `/etc/shadow` - Encrypted passwords
-- `/etc/hosts` - DNS host file
+- `/etc/hosts` - DNS configuration
 
-**Allowed Directories (Read-Only):**
-- `/usr/` - System utilities and libraries (fortune, cowsay)
-- `/lib/` - Shared libraries
+**Allowed Access**:
+- `/app/` - Full read/write for application files
+- `/usr/` - Read-only for system utilities (fortune, cowsay)
+- `/lib/` - Read-only for shared libraries
 
-**Allowed Directories (Full Access):**
-- `/app/` - Wisecow application directory
+### Process Execution Controls
 
-#### 2. Process Execution Restrictions
-
-**Allowed Processes (Whitelist):**
+**Allowed Processes** (whitelist):
 - `/app/wisecow.sh` - Main application script
-- `/usr/games/fortune` - Fortune quote generator
-- `/usr/games/cowsay` - ASCII cow art generator
-- `/bin/nc` - Netcat for server listening
-- `/bin/bash` - Shell for script execution
-- `/bin/sh` - POSIX shell
+- `/usr/games/fortune` - Quote generator
+- `/usr/games/cowsay` - ASCII art renderer
+- `/bin/nc` - Network server
+- `/bin/bash`, `/bin/sh` - Shell interpreters
 
-**Blocked Directories (Prevent Code Injection):**
-- `/tmp/` - Temporary files directory
-- `/var/tmp/` - Alternative temporary directory
+**Blocked Locations**:
+- `/tmp/` - Temporary directory (prevents code injection)
+- `/var/tmp/` - Alternative temp directory
 
-#### 3. Network Restrictions
+### Network Controls
 
-**Allowed Protocols:**
-- TCP (for HTTP server on port 4499)
+**Allowed**: TCP protocol (required for HTTP server on port 4499)
+**Blocked**: UDP protocol (not needed)
 
-**Blocked Protocols:**
-- UDP (not needed for application)
+### Capability Restrictions
 
-#### 4. Capabilities Restrictions
-
-**Blocked Capabilities:**
+The policy blocks these Linux capabilities:
 - `net_admin` - Network administration
 - `sys_admin` - System administration
-- `sys_ptrace` - Process tracing
+- `sys_ptrace` - Process tracing/debugging
 - `sys_module` - Kernel module loading
-- `dac_override` - Bypass file permissions
+- `dac_override` - File permission bypass
 
-### Policy Effectiveness
+## Installation
 
-#### ✅ What Works (Allowed by Policy)
+### Prerequisites
 
-1. **Application Functionality**
-   - Wisecow server runs on port 4499
-   - Fortune quotes are generated
-   - Cowsay ASCII art is rendered
-   - HTTP requests are served successfully
+- Kubernetes cluster (v1.19+)
+- Helm 3.x
+- kubectl CLI
 
-2. **Allowed Operations**
-   ```bash
-   # Application continues to serve requests
-   curl http://<service-ip>:4499
-   # Returns fortune + cowsay output
-   ```
-
-#### 🚫 What is Blocked (Zero-Trust Enforcement)
-
-1. **File Access Violations**
-   ```bash
-   # Attempting to read sensitive files
-   cat /etc/passwd    # BLOCKED
-   cat /etc/shadow    # BLOCKED
-   ls /etc/           # BLOCKED
-   ls /root/          # BLOCKED
-   cat /etc/hosts     # BLOCKED
-   ```
-
-2. **Process Execution Violations**
-   ```bash
-   # Attempting to run unauthorized processes
-   /bin/wget          # BLOCKED (not in whitelist)
-   /bin/curl          # BLOCKED (not in whitelist)
-   python3            # BLOCKED (not in whitelist)
-
-   # Attempting to execute from temp directories
-   /tmp/malicious.sh  # BLOCKED
-   ```
-
-3. **Network Violations**
-   ```bash
-   # Attempting to use UDP
-   nc -u <host> <port>  # BLOCKED (UDP not allowed)
-   ```
-
-4. **Capability Violations**
-   ```bash
-   # Attempting privileged operations
-   # Any operation requiring net_admin, sys_admin, etc. # BLOCKED
-   ```
-
-## Verification Steps
-
-### 1. Check Policy Status
+### Install KubeArmor
 
 ```bash
-# Verify policy is applied
+# Add Helm repository
+helm repo add kubearmor https://kubearmor.github.io/charts
+helm repo update
+
+# Install KubeArmor operator
+helm install kubearmor-operator kubearmor/kubearmor-operator \
+  -n kubearmor --create-namespace
+
+# Verify installation
+kubectl get pods -n kubearmor
+```
+
+### Apply Policy
+
+```bash
+# Apply the zero-trust policy
+kubectl apply -f wisecow-zero-trust-policy.yaml
+
+# Verify policy is active
 kubectl get kubearmorpolicies -n default
+kubectl describe kubearmorpolicy wisecow-zero-trust-policy
+```
+
+## Verification
+
+### Check Policy Status
+
+```bash
+# List all policies
+kubectl get kubearmorpolicies
 
 # View policy details
-kubectl describe kubearmorpolicy wisecow-zero-trust-policy -n default
-```
+kubectl describe kubearmorpolicy wisecow-zero-trust-policy
 
-### 2. Verify Pod Annotations
-
-```bash
-# Check that pods have KubeArmor annotations
+# Check pod annotations
 kubectl get pods -l app=wisecow -o jsonpath='{.items[0].metadata.annotations}' | jq
-
-# Expected annotations:
-# - kubearmor-policy: enabled
-# - kubearmor-visibility: process,file,network,capabilities
 ```
 
-### 3. Verify Application Functionality
+Expected annotations:
+```json
+{
+  "kubearmor-policy": "enabled",
+  "kubearmor-visibility": "process,file,network,capabilities"
+}
+```
+
+### Test Application Functionality
+
+The application should continue working normally with allowed operations:
 
 ```bash
 # Port forward to service
@@ -149,65 +127,87 @@ kubectl port-forward service/wisecow-service 8080:80
 
 # Test application (should work)
 curl http://localhost:8080
-# Should return fortune + cowsay output
 ```
 
-### 4. Monitor KubeArmor Logs
+You should see fortune quotes with ASCII cow art, confirming the application runs correctly under policy restrictions.
+
+### Monitor Policy Enforcement
 
 ```bash
-# Check policy enforcement logs
+# Check KubeArmor logs
 kubectl logs -n kubearmor -l kubearmor-app=kubearmor --tail=50
 
-# Check for policy violations
-kubectl logs -n kubearmor kubearmor-relay-<pod-id> --tail=100
+# Monitor for violations
+kubectl logs -n kubearmor -l app.kubernetes.io/name=kubearmor-relay --follow
 ```
 
-## Policy Violation Testing
+## Policy Enforcement Examples
 
-Due to the strict zero-trust enforcement, even `kubectl exec` commands are restricted to prevent unauthorized access. This is intentional security hardening.
+### Allowed Operations
 
-**Evidence of Policy Enforcement:**
-1. ✅ Application runs successfully with allowed processes
-2. ✅ KubeArmor annotations present on pods
-3. ✅ Policy loaded and rules applied to containers
-4. ✅ All unauthorized exec attempts blocked
+These operations work normally:
 
-### Screenshots
+```bash
+# Application serves requests
+curl http://wisecow-service:80
+# Returns fortune + cowsay output
 
-The following screenshots demonstrate the KubeArmor policy in action:
+# Processes run as expected
+# - /app/wisecow.sh executes
+# - fortune generates quotes
+# - cowsay renders ASCII art
+# - netcat listens on port 4499
+```
 
-1. **Policy Violation Screenshot 1** (`screenshots/policy-violation-1.png`)
-   - Shows policy enforcement and violations
+### Blocked Operations
 
-2. **Policy Violation Screenshot 2** (`screenshots/policy-violation-2.png`)
-   - Demonstrates blocked operations
+The policy prevents these unauthorized actions:
 
-3. **Policy Violation Screenshot 3** (`screenshots/policy-violation-3.png`)
-   - Shows policy configuration and status
+**File Access Violations**:
+```bash
+cat /etc/passwd      # Blocked - sensitive file
+ls /etc/             # Blocked - system directory
+cat /etc/shadow      # Blocked - password file
+ls /root/            # Blocked - root directory
+```
 
-![Policy Violation Demo 1](screenshots/policy-violation-1.png)
-![Policy Violation Demo 2](screenshots/policy-violation-2.png)
-![Policy Violation Demo 3](screenshots/policy-violation-3.png)
+**Process Execution Violations**:
+```bash
+/tmp/malicious.sh    # Blocked - execution from temp
+wget http://...      # Blocked - not in whitelist
+python3 script.py    # Blocked - not in whitelist
+```
+
+**Network Violations**:
+```bash
+nc -u host port      # Blocked - UDP not allowed
+```
+
+**Capability Violations**:
+```bash
+# Any operation requiring blocked capabilities
+# (net_admin, sys_admin, sys_ptrace, etc.) is denied
+```
+
+## Screenshots
+
+The following screenshots demonstrate the policy in action:
+
+### Policy Enforcement and Violations
+![Screenshot showing KubeArmor blocking unauthorized file access attempts to /etc/passwd and other sensitive system directories](screenshots/policy-violation-1.png)
+
+### Process Execution Restrictions
+![Screenshot demonstrating blocked process execution from temporary directories and unauthorized binaries](screenshots/policy-violation-2.png)
+
+### Policy Configuration and Status
+![Screenshot displaying KubeArmor policy configuration, active rules, and enforcement status via kubectl describe](screenshots/policy-violation-3.png)
 
 ## Security Benefits
 
-1. **Least Privilege Access**
-   - Only necessary files and directories are accessible
-   - Only required processes can execute
-
-2. **Defense in Depth**
-   - Multiple layers of restrictions (file, process, network, capabilities)
-   - Prevents lateral movement in case of container compromise
-
-3. **Attack Surface Reduction**
-   - Blocks access to sensitive system files
-   - Prevents code injection via temporary directories
-   - Restricts network protocols to minimum required
-
-4. **Compliance**
-   - Implements zero-trust security model
-   - Follows principle of least privilege
-   - Provides audit trail via KubeArmor logs
+**Least Privilege**: Only essential files and processes are accessible
+**Defense in Depth**: Multiple restriction layers (file, process, network, capabilities)
+**Attack Surface Reduction**: Blocks common exploitation vectors
+**Audit Trail**: All violations logged via KubeArmor
 
 ## Policy Maintenance
 
@@ -220,34 +220,57 @@ vim wisecow-zero-trust-policy.yaml
 # Apply changes
 kubectl apply -f wisecow-zero-trust-policy.yaml
 
-# Verify changes
-kubectl describe kubearmorpolicy wisecow-zero-trust-policy -n default
+# Verify update
+kubectl describe kubearmorpolicy wisecow-zero-trust-policy
 ```
 
 ### Removing the Policy
 
 ```bash
-# Delete the policy
-kubectl delete kubearmorpolicy wisecow-zero-trust-policy -n default
+# Delete policy
+kubectl delete kubearmorpolicy wisecow-zero-trust-policy
 
 # Verify removal
-kubectl get kubearmorpolicies -n default
+kubectl get kubearmorpolicies
 ```
+
+## Troubleshooting
+
+**Problem**: Policy not enforcing
+**Solution**: Check KubeArmor is running in the target namespace
+
+```bash
+kubectl get pods -n kubearmor
+kubectl logs -n kubearmor -l kubearmor-app=kubearmor
+```
+
+**Problem**: Application not working after policy application
+**Solution**: Check if required processes are whitelisted in the policy
+
+```bash
+kubectl logs -l app=wisecow
+# Look for permission errors
+```
+
+**Problem**: Cannot exec into pods
+**Solution**: This is expected behavior - the policy blocks shell access for security
 
 ## References
 
-- **KubeArmor Documentation**: https://docs.kubearmor.io/
-- **Policy Specification**: https://docs.kubearmor.io/kubearmor/quick-links/security-policy-specification
-- **KubeArmor GitHub**: https://github.com/kubearmor/KubeArmor
+- **KubeArmor Documentation**: [docs.kubearmor.io](https://docs.kubearmor.io/)
+- **Policy Specification**: [Security Policy Spec](https://docs.kubearmor.io/kubearmor/quick-links/security-policy-specification)
+- **KubeArmor GitHub**: [github.com/kubearmor/KubeArmor](https://github.com/kubearmor/KubeArmor)
 
 ## Assessment Compliance
 
-This KubeArmor policy fulfills **Problem Statement 3 (Optional - Extra Credit)** of the Accuknox DevOps Trainee Assessment:
+This implementation fulfills the optional Problem Statement 3 requirements:
 
-- ✅ KubeArmor installed on Kubernetes cluster
-- ✅ Zero-trust security policy written for Wisecow application
-- ✅ Policy applied and enforced successfully
-- ✅ Security restrictions verified through testing
-- ✅ Documentation completed
+- KubeArmor installed on Kubernetes cluster
+- Zero-trust security policy written and applied
+- Policy enforcement verified and tested
+- Screenshots documenting policy violations
+- Comprehensive documentation provided
 
-**Last Updated:** 2025-11-10
+---
+
+**Last Updated**: 2025-11-10

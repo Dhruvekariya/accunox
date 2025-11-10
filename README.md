@@ -1,343 +1,254 @@
-# Accuknox DevOps Trainee Assessment
+# Wisecow Application - DevOps Assessment
 
-**Candidate:** Dhruv Vekariya
-**Repository:** https://github.com/Dhruvekariya/accunox
-**Docker Image:** https://hub.docker.com/r/dhruvekariyaa/wisecow
+A containerized fortune-telling web application deployed on Kubernetes with automated CI/CD, TLS support, and zero-trust security policies.
 
-This repository contains the complete implementation of the Accuknox DevOps Trainee Practical Assessment including:
-- Problem Statement 1: Wisecow Application Containerization & Kubernetes Deployment
-- Problem Statement 2: System Monitoring Scripts (Application Health Checker + System Health Monitor)
-- Problem Statement 3: KubeArmor Zero-Trust Policy (Optional - Complete)
+**Live Demo:** [Docker Hub](https://hub.docker.com/r/dhruvekariyaa/wisecow)
+**Repository:** [github.com/Dhruvekariya/accunox](https://github.com/Dhruvekariya/accunox)
 
----
+## What is Wisecow?
 
-## Overview
+Wisecow is a simple web server that combines classic Unix tools (`fortune` and `cowsay`) to serve random inspirational quotes with ASCII cow art. This project demonstrates containerization, Kubernetes orchestration, automated deployment pipelines, and security hardening practices.
 
-**Wisecow Application:** A simple web server that serves random fortune quotes with ASCII cow art on port 4499.
+## Features
 
-### Features Implemented
-- ✅ Dockerized application (Ubuntu 22.04 base)
-- ✅ Kubernetes deployment with 2 replicas
-- ✅ Automated CI/CD pipeline (GitHub Actions)
-- ✅ TLS/HTTPS support via NGINX Ingress (Challenge Goal)
-- ✅ Continuous Deployment automation (Challenge Goal)
-- ✅ Application Health Monitoring script
-- ✅ System Health Monitoring script
-- ✅ KubeArmor Zero-Trust Security Policy (Optional)
+- **Containerized Application**: Multi-architecture Docker image supporting AMD64 and ARM64
+- **Kubernetes Ready**: Production-grade deployment manifests with health probes and resource limits
+- **Automated CI/CD**: GitHub Actions workflow for building and pushing images
+- **Secure by Default**: TLS/HTTPS support via NGINX Ingress Controller
+- **Zero-Trust Security**: KubeArmor policy implementation (optional challenge completed)
+- **Monitoring Tools**: Python scripts for application and system health monitoring
 
----
+## Quick Start
 
-## 📋 Assessment Requirement Clarification
+### Running Locally with Docker
 
-**Repository Visibility:**
-The assessment PDF contains a contradiction:
-- Page 1 states: "A **private** GitHub repository"
-- Page 2 states: "The GitHub repository should be set to **public**"
+```bash
+# Build the image
+docker build -t wisecow:latest .
 
-**✅ Implementation Decision:** This repository is **PUBLIC** following the explicit "Access Control" section on page 2, which is the authoritative final requirement and necessary for assessment review.
+# Run the container
+docker run -p 4499:4499 wisecow:latest
 
----
+# Visit http://localhost:4499
+```
 
-## Prerequisites
+### Deploying to Kubernetes
 
-- Docker
-- Kubernetes cluster (Minikube, Kind, or OrbStack)
-- kubectl
-- Docker Hub account
+```bash
+# Deploy application
+kubectl apply -f k8s/
+
+# Verify deployment
+kubectl get pods -l app=wisecow
+
+# Access the service
+kubectl port-forward service/wisecow-service 8080:80
+curl http://localhost:8080
+```
 
 ## Project Structure
 
 ```
 .
-├── Dockerfile                      # Multi-arch container (linux/amd64, linux/arm64)
-├── wisecow.sh                      # Main application script
-├── LICENSE                         # Apache License 2.0
-├── README.md                       # This file
-│
+├── Dockerfile                      # Multi-arch container image
+├── wisecow.sh                      # Application entrypoint
 ├── k8s/                           # Kubernetes manifests
-│   ├── deployment.yaml            # Deployment with 2 replicas, health probes
+│   ├── deployment.yaml            # Deployment with 2 replicas
 │   ├── service.yaml               # ClusterIP service
-│   └── ingress.yaml               # Ingress with TLS configuration
-│
+│   └── ingress.yaml               # TLS-enabled ingress
 ├── .github/workflows/             # CI/CD automation
-│   └── docker-build-push.yaml     # GitHub Actions workflow
-│
-├── scripts/                       # Deployment automation
-│   └── deploy.sh                  # Kubernetes deployment script
-│
-├── docs/                          # Documentation
-│   └── CD_SETUP.md                # Continuous Deployment guide
-│
-├── monitoring-scripts/            # Problem Statement 2
-│   ├── app_health_checker.py      # HTTP health monitoring
-│   ├── system_health_monitor.py   # System resource monitoring
-│   ├── sample-urls.txt            # Sample URLs for testing
-│   └── README.md                  # Monitoring scripts documentation
-│
-└── kubearmor-policies/            # Problem Statement 3 (Complete)
-    ├── wisecow-zero-trust-policy.yaml  # KubeArmor security policy
-    └── README.md                       # Policy documentation
+│   └── docker-build-push.yaml     # GitHub Actions pipeline
+├── scripts/                       # Helper scripts
+│   └── deploy.sh                  # Automated deployment
+├── monitoring-scripts/            # Health monitoring tools
+│   ├── app_health_checker.py      # HTTP endpoint monitoring
+│   └── system_health_monitor.py   # System resource monitoring
+└── kubearmor-policies/            # Security policies
+    ├── wisecow-zero-trust-policy.yaml
+    └── screenshots/               # Policy enforcement demos
 ```
 
-## Local Development
+## Prerequisites
 
-### Build Docker Image
-
-```bash
-docker build -t dhruvekariyaa/wisecow:latest .
-```
-
-### Run Locally
-
-```bash
-docker run -p 4499:4499 dhruvekariyaa/wisecow:latest
-```
-
-Access the application at `http://localhost:4499`
-
-## Kubernetes Deployment
-
-### Deploy to Kubernetes
-
-```bash
-# Apply deployment
-kubectl apply -f k8s/deployment.yaml
-
-# Apply service
-kubectl apply -f k8s/service.yaml
-
-# Check status
-kubectl get deployments,pods,services
-```
-
-### Test the Deployment
-
-```bash
-# Port forward to test
-kubectl port-forward service/wisecow-service 8080:80
-
-# Test
-curl http://localhost:8080
-```
+- Docker (for local development)
+- Kubernetes cluster (Minikube, Kind, or managed cluster)
+- kubectl CLI tool
+- Docker Hub account (for CI/CD)
 
 ## CI/CD Pipeline
 
-### Continuous Integration (Automated)
+This project uses GitHub Actions to automate building and publishing Docker images. On every push to the `main` branch:
 
-The GitHub Actions workflow automatically:
-1. Builds the Docker image on every push to `main` branch
-2. Pushes the image to Docker Hub with tags (`latest` and SHA-based)
-3. Uses layer caching to speed up builds
+1. Docker image is built with layer caching
+2. Image is tagged with `latest` and commit SHA
+3. Image is pushed to Docker Hub
 
-**Workflow file:** `.github/workflows/docker-build-push.yaml`
+### Setting Up CI/CD
 
-### Continuous Deployment
+Add your Docker Hub credentials to GitHub Secrets:
 
-For deployment automation:
+```
+Settings → Secrets and variables → Actions → New repository secret
+Name: DOCKER_TOKEN
+Value: <your-docker-hub-access-token>
+```
+
+### Deploying Updates
+
 ```bash
-# Deploy latest image
+# Automated deployment script
 ./scripts/deploy.sh
 
-# Deploy specific image tag
+# Or deploy specific image tag
 IMAGE_NAME=dhruvekariyaa/wisecow:main-abc1234 ./scripts/deploy.sh
 ```
 
-**📖 For detailed CD setup options, see:** [docs/CD_SETUP.md](docs/CD_SETUP.md)
-
-### Setup GitHub Secrets
-
-Add the following secret to your GitHub repository:
-
-- `DOCKER_TOKEN`: Your Docker Hub access token
-
-**Steps to add secrets:**
-1. Go to repository Settings → Secrets and variables → Actions
-2. Click "New repository secret"
-3. Add `DOCKER_TOKEN` with your Docker Hub access token
-
-### Verify CI/CD Pipeline
-
-```bash
-# Make a change
-git commit -am "Test CI/CD"
-git push
-
-# Watch GitHub Actions
-# Visit: https://github.com/YOUR_USERNAME/accunox/actions
-
-# Once CI completes, deploy
-./scripts/deploy.sh
-```
-
-## Application Features
-
-- **Base Image**: Ubuntu 22.04
-- **Dependencies**: fortune-mod, cowsay, netcat
-- **Port**: 4499
-- **Replicas**: 2 (configurable)
-- **Resource Limits**:
-  - Memory: 64Mi (request) / 128Mi (limit)
-  - CPU: 100m (request) / 200m (limit)
-- **Health Checks**: Liveness and Readiness probes configured
-
-## Docker Hub
-
-Image available at: `dhruvekariyaa/wisecow:latest`
+For more deployment strategies, see [docs/CD_SETUP.md](docs/CD_SETUP.md).
 
 ## TLS Configuration
 
-The application is configured with HTTPS using self-signed certificates and NGINX Ingress Controller.
+The application supports HTTPS using NGINX Ingress Controller with self-signed certificates.
 
-### Prerequisites for TLS
-- NGINX Ingress Controller installed in cluster
-- Self-signed TLS certificate (or use cert-manager for production)
-
-### Deploy with TLS
+### Setup TLS
 
 ```bash
-# Install NGINX Ingress Controller (if not already installed)
+# Install NGINX Ingress Controller
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
 
-# Create TLS certificate (self-signed for testing)
+# Generate self-signed certificate
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
   -keyout wisecow-tls.key \
   -out wisecow-tls.crt \
   -subj "/CN=wisecow.local/O=wisecow"
 
-# Create Kubernetes TLS secret
+# Create TLS secret
 kubectl create secret tls wisecow-tls --cert=wisecow-tls.crt --key=wisecow-tls.key
 
-# Apply all manifests
-kubectl apply -f k8s/
-
-# Verify Ingress
-kubectl get ingress
+# Deploy with ingress
+kubectl apply -f k8s/ingress.yaml
 ```
 
-### Access via HTTPS
+### Testing HTTPS
 
 ```bash
-# Port forward the Ingress controller
+# Port forward ingress controller
 kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 8443:443
 
-# Test HTTPS connection
+# Test connection
 curl -k -H "Host: wisecow.local" https://localhost:8443
 ```
 
-**TLS Details:**
-- Domain: wisecow.local
-- Certificate: Self-signed X.509
-- Validity: 365 days
-- Ingress: NGINX with TLS termination
+## Monitoring Scripts
 
----
+This project includes two Python-based monitoring tools for production environments.
 
-## Problem Statement 2: Monitoring Scripts
+### Application Health Checker
 
-This repository includes two production-ready monitoring scripts located in `monitoring-scripts/`:
+Monitors HTTP endpoints and reports their status.
 
-### 1. Application Health Checker (`app_health_checker.py`)
-
-Monitors application uptime by checking HTTP status codes.
-
-**Features:**
-- Single or multiple URL monitoring
-- HTTP status code analysis (200-599)
-- UP/DOWN status determination
-- Continuous monitoring mode
-- File-based URL input
-- Configurable timeout
-- Color-coded console output
-
-**Usage:**
 ```bash
-# Check single application
+# Check single URL
 python3 monitoring-scripts/app_health_checker.py https://example.com
 
-# Check multiple applications
-python3 monitoring-scripts/app_health_checker.py https://google.com https://github.com
+# Monitor continuously
+python3 monitoring-scripts/app_health_checker.py --continuous --interval 60 https://api.example.com
 
-# Continuous monitoring (every 60 seconds)
-python3 monitoring-scripts/app_health_checker.py --continuous --interval 60 https://example.com
-
-# From file
+# Check multiple URLs from file
 python3 monitoring-scripts/app_health_checker.py --file monitoring-scripts/sample-urls.txt
 ```
 
-### 2. System Health Monitor (`system_health_monitor.py`)
+**Features**: HTTP status code validation, continuous monitoring, file-based URL input, timeout handling
 
-Monitors system resources with threshold-based alerting.
+### System Health Monitor
 
-**Features:**
-- CPU usage monitoring
-- Memory usage monitoring
-- Disk space monitoring
-- Top 5 CPU-consuming processes
-- Configurable thresholds (default: 80%)
-- Alert system for exceeded thresholds
-- Continuous monitoring mode
-- File logging support
-- Cross-platform (macOS/Linux)
+Tracks system resources and alerts on threshold violations.
 
-**Usage:**
 ```bash
-# One-time system check
+# One-time check
 python3 monitoring-scripts/system_health_monitor.py
 
 # Continuous monitoring with logging
-python3 monitoring-scripts/system_health_monitor.py --continuous --interval 60 --log health.log
+python3 monitoring-scripts/system_health_monitor.py --continuous --log /var/log/health.log
 
 # Custom thresholds
 python3 monitoring-scripts/system_health_monitor.py --thresholds cpu=90,memory=85,disk=80
 ```
 
-**📖 Complete documentation:** [monitoring-scripts/README.md](monitoring-scripts/README.md)
+**Features**: CPU/memory/disk monitoring, process tracking, threshold alerts, cross-platform support (Linux/macOS)
 
----
+See [monitoring-scripts/README.md](monitoring-scripts/README.md) for complete documentation.
 
-## Assessment Status
+## Security: KubeArmor Zero-Trust Policy
 
-### ✅ Problem Statement 1: Complete (100%)
-- [x] Dockerization (Multi-arch: amd64/arm64)
-- [x] Kubernetes Deployment
-- [x] CI/CD Pipeline (GitHub Actions)
-- [x] TLS Implementation (Challenge Goal)
-- [x] Continuous Deployment (Challenge Goal)
+This project implements runtime security using KubeArmor with a zero-trust policy that restricts container behavior.
 
-**Latest Updates:**
-- Built and pushed multi-architecture Docker image (supports both Intel and ARM)
-- Image available: `dhruvekariyaa/wisecow:latest`
-- Verified deployment on OrbStack Kubernetes
+**Policy Highlights**:
+- Blocks access to sensitive system directories (`/etc`, `/root`, `/var/log`)
+- Prevents execution from temporary directories (`/tmp`, `/var/tmp`)
+- Restricts network protocols (UDP blocked, TCP allowed)
+- Limits process execution to application-required binaries
 
-### ✅ Problem Statement 2: Complete (100%)
-- [x] Application Health Checker Script
-- [x] System Health Monitor Script
+**Installation**:
+```bash
+# Install KubeArmor via Helm
+helm repo add kubearmor https://kubearmor.github.io/charts
+helm install kubearmor-operator kubearmor/kubearmor-operator -n kubearmor --create-namespace
 
-**Both scripts tested and working:**
-- HTTP health monitoring with status code analysis
-- System resource monitoring with threshold alerts
+# Apply policy
+kubectl apply -f kubearmor-policies/wisecow-zero-trust-policy.yaml
+```
 
-### ✅ Problem Statement 3: Complete (100%) - Optional Extra Credit
-- [x] KubeArmor installation (Helm deployed)
-- [x] KubeArmor operator and controller running
-- [x] Zero-trust policy written with proper syntax
-- [x] Policy applied and enforced successfully
-- [x] Policy validation and testing completed
-- [x] Screenshots captured showing policy violations
-- [x] Comprehensive documentation created
+**Verification**:
+```bash
+# Check policy status
+kubectl get kubearmorpolicies
 
-**Latest Updates:**
-- KubeArmor v1.6.3 installed via Helm in `kubearmor` namespace
-- Zero-trust policy enforcing file, process, network, and capability restrictions
-- Policy successfully blocks unauthorized access while allowing application to function
-- **Screenshots included**: 3 images demonstrating policy violations and enforcement
-- Complete security documentation with verification steps
+# View policy details
+kubectl describe kubearmorpolicy wisecow-zero-trust-policy
+```
 
-**📖 Complete documentation:** [kubearmor-policies/README.md](kubearmor-policies/README.md)
-**📸 Screenshots:** [kubearmor-policies/screenshots/](kubearmor-policies/screenshots/)
+See [kubearmor-policies/README.md](kubearmor-policies/README.md) for detailed policy documentation and [screenshots](kubearmor-policies/screenshots/) demonstrating policy enforcement.
 
----
+## Application Specifications
+
+| Component | Details |
+|-----------|---------|
+| Base Image | Ubuntu 22.04 |
+| Runtime Port | 4499 |
+| Dependencies | fortune-mod, cowsay, netcat |
+| Replicas | 2 (configurable) |
+| CPU Request/Limit | 100m / 200m |
+| Memory Request/Limit | 64Mi / 128Mi |
+| Health Checks | TCP socket on port 4499 |
+
+## Assessment Implementation
+
+This repository fulfills the requirements for the Accuknox DevOps Trainee Practical Assessment:
+
+**Problem Statement 1** - Wisecow Containerization & Kubernetes Deployment
+- Dockerfile with multi-architecture support
+- Kubernetes manifests (deployment, service, ingress)
+- GitHub Actions CI/CD workflow
+- TLS implementation (challenge goal)
+- Automated deployment (challenge goal)
+
+**Problem Statement 2** - System Monitoring Scripts
+- Application health checker (HTTP monitoring)
+- System health monitor (resource monitoring)
+
+**Problem Statement 3** - KubeArmor Zero-Trust Policy (Optional)
+- Policy implementation and enforcement
+- Documentation with screenshots
+- Security verification tests
+
+## Contributing & Development
+
+This project was developed as part of a technical assessment. Feel free to fork, modify, and use it as a reference for your own Kubernetes deployments.
 
 ## License
 
-This project follows the original Wisecow repository license (Apache License 2.0).
+Apache License 2.0 - following the original [Wisecow](https://github.com/nyrahul/wisecow) project license.
+
+---
+
+**Note**: This repository is set to public as specified in the assessment requirements (Access Control section, Page 2).

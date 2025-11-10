@@ -4,7 +4,7 @@ This document explains the Continuous Deployment (CD) strategy for the Wisecow a
 
 ## Current Setup
 
-### Continuous Integration (CI) ✅
+### Continuous Integration (CI)
 - **Automated:** Yes
 - **Trigger:** Push to `main` branch
 - **Actions:**
@@ -28,11 +28,11 @@ IMAGE_NAME=dhruvekariyaa/wisecow:main-abc1234 ./scripts/deploy.sh
 ```
 
 ### Features
-- ✅ Updates deployment with new image
-- ✅ Waits for rollout completion
-- ✅ Shows deployment status
-- ✅ Validates kubectl availability
-- ✅ Handles both new and existing deployments
+- Updates deployment with new image
+- Waits for rollout completion
+- Shows deployment status
+- Validates kubectl availability
+- Handles both new and existing deployments
 
 ## Option 2: GitHub Actions Self-Hosted Runner (For Production)
 
@@ -178,11 +178,14 @@ curl http://localhost:8080
 
 ## Security Considerations
 
-- ✅ Docker Hub credentials stored as GitHub Secrets
-- ✅ No cluster credentials in repository
-- ✅ TLS certificates stored as Kubernetes secrets
-- ⚠️ Self-signed certificates (use cert-manager for production)
-- ⚠️ LoadBalancer exposed (use Ingress + authentication for production)
+**Current Security Measures**:
+- Docker Hub credentials stored as GitHub Secrets
+- No cluster credentials in repository
+- TLS certificates stored as Kubernetes secrets
+
+**Production Recommendations**:
+- Use cert-manager for automated certificate management
+- Configure Ingress with authentication for production deployments
 
 ## Future Enhancements
 
