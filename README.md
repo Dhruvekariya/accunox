@@ -323,15 +323,18 @@ python3 monitoring-scripts/system_health_monitor.py --thresholds cpu=90,memory=8
 - [x] Zero-trust policy written with proper syntax
 - [x] Policy applied and enforced successfully
 - [x] Policy validation and testing completed
+- [x] Screenshots captured showing policy violations
 - [x] Comprehensive documentation created
 
 **Latest Updates:**
 - KubeArmor v1.6.3 installed via Helm in `kubearmor` namespace
 - Zero-trust policy enforcing file, process, network, and capability restrictions
 - Policy successfully blocks unauthorized access while allowing application to function
+- **Screenshots included**: 3 images demonstrating policy violations and enforcement
 - Complete security documentation with verification steps
 
 **📖 Complete documentation:** [kubearmor-policies/README.md](kubearmor-policies/README.md)
+**📸 Screenshots:** [kubearmor-policies/screenshots/](kubearmor-policies/screenshots/)
 
 ---
 

@@ -172,6 +172,23 @@ Due to the strict zero-trust enforcement, even `kubectl exec` commands are restr
 3. ✅ Policy loaded and rules applied to containers
 4. ✅ All unauthorized exec attempts blocked
 
+### Screenshots
+
+The following screenshots demonstrate the KubeArmor policy in action:
+
+1. **Policy Violation Screenshot 1** (`screenshots/policy-violation-1.png`)
+   - Shows policy enforcement and violations
+
+2. **Policy Violation Screenshot 2** (`screenshots/policy-violation-2.png`)
+   - Demonstrates blocked operations
+
+3. **Policy Violation Screenshot 3** (`screenshots/policy-violation-3.png`)
+   - Shows policy configuration and status
+
+![Policy Violation Demo 1](screenshots/policy-violation-1.png)
+![Policy Violation Demo 2](screenshots/policy-violation-2.png)
+![Policy Violation Demo 3](screenshots/policy-violation-3.png)
+
 ## Security Benefits
 
 1. **Least Privilege Access**
@@ -233,4 +250,4 @@ This KubeArmor policy fulfills **Problem Statement 3 (Optional - Extra Credit)**
 - ✅ Security restrictions verified through testing
 - ✅ Documentation completed
 
-**Last Updated:** 2025-11-08
+**Last Updated:** 2025-11-10

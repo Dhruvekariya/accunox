@@ -18,3 +18,4 @@ Thumbs.db
 # Local development files
 commands.txt
 TASK_TRACKER.md
+.claude/
